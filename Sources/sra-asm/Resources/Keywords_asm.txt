@@ -1,0 +1,5 @@
+exec
+data
+main
+func
+label

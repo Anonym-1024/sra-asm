@@ -1,0 +1,45 @@
+<asm> -> ?<sections>? .eof
+
+<sections> -> <section> ?\n <sections>?
+
+<section> -> <exec>
+<section> -> <data>
+
+<exec> -> exec { ?<exec-blocks>? }
+
+<exec-blocks> -> <exec-block> \n ?<exec-blocks>?
+
+<exec-block> -> main { ?<instructions>? }
+<exec-block> -> .identifier ?(link: .identifier)? ?(<func-arguments>)? ?(ret: .identifier)?{ ?<instructions>? }
+
+<func-arguments> -> <func-argument> ?, <func-arguments>?
+<func-argument> -> .identifier : .identifier
+
+<instructions> -> <instruction> ?\n <instructions>?
+<instructions> -> <label> ?\n? <instructions>
+
+<instruction> -> .instruction ?<arguments>?
+
+<label> -> .identifier :
+
+<arguments> -> <argument> ?, <arguments>?
+
+<argument> -> .label
+<argument> -> <immediate>
+
+<immediate> -> # .numericLiteral ?[ .numericLiteral ]?
+
+<data> -> data { ?<data-blocks>? }
+
+<data-blocks> -> <data-block> ?\n <data-blocks>?
+
+<data-block> -> <variables>
+<data-block> -> .identifier { <variables> }
+
+<variables> -> <variable> ?\n <variables>?
+
+<variable> -> .identifier ?= .numericLiteral?
+<variable> -> .identifier ?= .charLiteral?
+
+
+

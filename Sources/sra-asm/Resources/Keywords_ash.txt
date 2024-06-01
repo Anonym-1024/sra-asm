@@ -1,0 +1,8 @@
+header
+compile
+link
+include
+name
+product
+exec
+lib
