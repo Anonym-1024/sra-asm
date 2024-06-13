@@ -125,6 +125,21 @@ public class Parser {
     
     
     
+    func parse(_ tokens: [Token]) throws -> AST {
+        self.tokens = tokens
+        self.pos = 0
+        self.errors = []
+        self.parsing = []
+        
+        
+        if fileType == .asm {
+            return .init(fileType: .asm, root: try parseAsm())
+        } else {
+            return .init(fileType: .ash, root: try parseAsm())
+        }
+    }
+    
+    
     
     
     
@@ -142,10 +157,9 @@ public class Parser {
         if let sections = try? parseSections() {
             children.append(sections)
         }
-        // errors.removeAll()
         
         guard let eof = popTerminal(kind: .eof) else { throw error(.expectedTerminalOfKind(.eof)) }
-        children.append(.terminal(eof))
+    
         
         
         return .nonTerminal(.asm, children: children)
@@ -160,14 +174,19 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        let section = try parseSection()
-        children.append(section)
-        
-        if popNewLine() {
-            if let sections = try? parseSections() {
-                children.append(sections)
+        if let section = try? parseSection() {
+            children.append(section)
+            
+            while popNewLine(), let section_ = try? parseSection() {
+                children.append(section_)
             }
+        } else {
+            throw error(.expectedNonTerminal(.section))
         }
+        //
+        
+        
+        
         
         
         return .nonTerminal(.sections, children: children)
@@ -209,14 +228,12 @@ public class Parser {
         children.append(.terminal(exec))
         
         guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
-        children.append(.terminal(braceL))
         
         if let functions = try? parseFunctions() {
             children.append(functions)
         }
         
         guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
-        children.append(.terminal(braceR))
         
         
         return .nonTerminal(.exec, children: children)
@@ -231,13 +248,14 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        let function = try parseFunction()
-        children.append(function)
-        
-        if popNewLine() {
-            if let functions = try? parseFunctions() {
-                children.append(functions)
+        if let function = try? parseFunction() {
+            children.append(function)
+            
+            while popNewLine(), let function_ = try? parseFunction() {
+                children.append(function_)
             }
+        }  else {
+            throw error(.expectedNonTerminal(.function))
         }
         
         
@@ -257,14 +275,12 @@ public class Parser {
             children.append(.terminal(main))
             
             guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
-            children.append(.terminal(braceL))
             
             if let instructions = try? parseInstructions() {
                 children.append(instructions)
             }
             
             guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
-            children.append(.terminal(braceR))
             
         } else {
             guard let identifier = popTerminal(kind: .identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
@@ -282,14 +298,12 @@ public class Parser {
             }
             
             guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
-            children.append(.terminal(braceL))
             
             if let instructions = try? parseInstructions() {
                 children.append(instructions)
             }
             
             guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
-            children.append(.terminal(braceR))
         }
         
         
@@ -357,14 +371,14 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        let instruction = try parseInstruction()
-        children.append(instruction)
-        
-        if parseBreak() {
+        if let instruction = try? parseInstruction() {
+            children.append(instruction)
             
-            if let instructions = try? parseInstructions() {
-                children.append(instructions)
+            while parseBreak(), let instruction_ = try? parseInstruction() {
+                children.append(instruction_)
             }
+        } else {
+            throw error(.expectedNonTerminal(.instruction))
         }
         
         return .nonTerminal(.instructions, children: children)
@@ -416,7 +430,6 @@ public class Parser {
         children.append(.terminal(identifier))
         
         guard let colon = popTerminal(":") else { throw error(.expectedTerminal(":")) }
-        children.append(.terminal(colon))
         
         popNewLine()
         
@@ -433,13 +446,14 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        let arg = try parseArg()
-        children.append(arg)
-        
-        if let dot = popTerminal(",") {
+        if let arg = try? parseArg() {
+            children.append(arg)
             
-            let args = try parseArgs()
-            children.append(args)
+            while popTerminal(",") != nil, let arg_ = try? parseArg() {
+                children.append(arg_)
+            }
+        }  else {
+            throw error(.expectedNonTerminal(.arg))
         }
         
         return .nonTerminal(.args, children: children)
@@ -507,14 +521,12 @@ public class Parser {
         children.append(.terminal(data))
         
         guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
-        children.append(.terminal(braceL))
         
         if let dataBlocks = try? parseDataBlocks() {
             children.append(dataBlocks)
         }
         
         guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
-        children.append(.terminal(braceR))
         
         return .nonTerminal(.data, children: children)
     }
@@ -528,14 +540,15 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        let dataBlock = try parseDataBlock()
-        children.append(dataBlock)
-        
-        
+        if let dataBlock = try? parseDataBlock() {
+            children.append(dataBlock)
             
-            if let dataBlocks = try? parseDataBlocks() {
-                children.append(dataBlocks)
+            while let dataBlock_ = try? parseDataBlock() {
+                children.append(dataBlock_)
             }
+        }  else {
+            throw error(.expectedNonTerminal(.dataBlock))
+        }
         
         
         return .nonTerminal(.dataBlocks, children: children)
@@ -563,6 +576,7 @@ public class Parser {
             
             
             guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
+            
             parseBreak()
         } else {
             let variables = try parseVariables()
@@ -582,14 +596,15 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        let variable = try parseVariable()
-        children.append(variable)
-        
-        if parseBreak() {
-            if let variables = try? parseVariables() {
-                children.append(variables)
-            }
+        if let variable = try? parseVariable() {
+            children.append(variable)
             
+            while parseBreak(), let variable_ = try? parseVariable() {
+                
+                children.append(variable_)
+            }
+        } else {
+            throw error(.expectedNonTerminal(.variable))
         }
         
         return .nonTerminal(.variables, children: children)
@@ -625,6 +640,49 @@ public class Parser {
         
         return .nonTerminal(.variable, children: children)
     }
+    
+    
+    
+    
+    
+    // ------ Parsing ASM -------
+    
+    /*
+    func parseAsh() throws -> AST.Node {
+        
+    }
+    
+    func parseHeader() throws -> AST.Node {
+        
+    }
+    
+    func parseCompile() throws -> AST.Node {
+        
+    }
+    
+    func parseUrls() throws -> AST.Node {
+        
+    }
+    
+    func parseUrl() throws -> AST.Node {
+        
+    }
+    
+    func parseLink() throws -> AST.Node {
+        
+    }
+    
+    func parseDLibs() throws -> AST.Node {
+        
+    }
+    
+    func parseDLib() throws -> AST.Node {
+        
+    }
+    
+    func parseInclude() throws -> AST.Node {
+        
+    }*/
     
     
 }
