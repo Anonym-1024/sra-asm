@@ -12,14 +12,14 @@ public struct AST {
     let fileType: File.FileType
     let root: Node
     
-    struct Node {
+    public struct Node {
         var isTerminal: Bool
         var terminal: Token?
         var nonterminal: NonTerminal?
         var children: [Self]?
         
         enum NonTerminal {
-            case asm, sections, section, exec, execBlocks, execBlock, funcArgument, funcArguments, instructions, instruction, label, arguments, argument, imediate, data, dataBlocks, dataBlock, variables, variable
+            case asm, sections, section, exec, functions, function, funcArgs, funcArg, location, instructions, instruction, `break`, label, args, arg, immediate, data, dataBlocks, dataBlock, variables, variable
         }
         
         static func terminal(_ content: Token) -> Self {
@@ -29,6 +29,27 @@ public struct AST {
         static func nonTerminal(_ kind: NonTerminal, children: [Node]) -> Self {
             Node(isTerminal: false, terminal: nil, nonterminal: kind, children: children)
         }
+        
+        public func stringRep(level: Int) -> String {
+            var string = ""
+            var l = level
+            if isTerminal {
+                for _ in 0..<l {
+                    string.append("|   ")
+                }
+                string.append("\(terminal!)\n")
+            } else {
+                for _ in 0...l {
+                    string.append("|   ")
+                }
+                string.append("Non-terminal: \(nonterminal!)\n")
+                for child in children ?? [] {
+                    string.append(child.stringRep(level: l+1))
+                }
+            }
+            return string
+        }
+        
     }
     
     

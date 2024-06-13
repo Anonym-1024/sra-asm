@@ -8,24 +8,31 @@
 import Foundation
 
 
-struct ParserError: CompilerError {
-    public init(line: Int, kind: ParserError.Kind) {
+public struct ParserError: CompilerError {
+    init(line: Int, kind: ParserError.Kind, parsing: AST.Node.NonTerminal) {
         self.line = line
         self.kind = kind
+        self.parsing = parsing
     }
     
     var line: Int
+    var parsing: AST.Node.NonTerminal
     
     var errorDescription: String {
         switch kind {
         case .expectedTerminalOfKind(let kind):
-            return "Excepted terminal of kind \(kind)"
+            return "Expected terminal of kind \(kind); Found while parsing: \(parsing)"
         case .expectedTerminal(let terminal):
-            return "Excepted terminal \(terminal)"
-        case .invalidFuncArguments:
-            return "Invalid func arguments"
+            return "Expected terminal \(terminal); Found while parsing: \(parsing)"
+        case .expectedNonTerminal(let nonTerminal):
+            return "Expected nonterminal \(nonTerminal); Found while parsing: \(parsing)"
         case .outOfRange:
             return "Out of range"
+        case .invalidInstruction:
+            return "Unknown instruction"
+        case .notVariable:
+            return "Not a variable"
+        
         }
     }
     
@@ -34,7 +41,9 @@ struct ParserError: CompilerError {
     enum Kind {
         case expectedTerminalOfKind(Token.Kind)
         case expectedTerminal(String)
-        case invalidFuncArguments
+        case expectedNonTerminal(AST.Node.NonTerminal)
         case outOfRange
+        case invalidInstruction
+        case notVariable
     }
 }

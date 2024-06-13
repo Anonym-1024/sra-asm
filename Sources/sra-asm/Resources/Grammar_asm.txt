@@ -5,27 +5,32 @@
 <section> -> <exec>
 <section> -> <data>
 
-<exec> -> exec { ?<exec-blocks>? }
+<exec> -> exec { ?<functions>? }
 
-<exec-blocks> -> <exec-block> \n ?<exec-blocks>?
+<functions> -> <function> ?\n <functions>?
 
-<exec-block> -> main { ?<instructions>? }
-<exec-block> -> .identifier ?(link: .identifier)? ?(<func-arguments>)? ?(ret: .identifier)?{ ?<instructions>? }
+<function> -> main { ?<instructions>? }
+<function> -> .identifier ?(link : <location>)? ?(<func-args>)? ?(ret : <location>)? { ?<instructions>? }
 
-<func-arguments> -> <func-argument> ?, <func-arguments>?
-<func-argument> -> .identifier : .identifier
+<func-args> -> <func-arg> ?,<func-args>?
 
-<instructions> -> <instruction> ?\n <instructions>?
-<instructions> -> <label> ?\n? <instructions>
+<func-arg> -> .identifier : <location>
 
-<instruction> -> .instruction ?<arguments>?
+<location> -> .identifier ?. <location>?
 
-<label> -> .identifier :
+<instructions> -> <instruction> ?<break> <instructions>?
 
-<arguments> -> <argument> ?, <arguments>?
+<break> -> \n
+<break> -> ;
 
-<argument> -> .label
-<argument> -> <immediate>
+<instruction> -> ?<label>? .instruction ?<args>?
+
+<label> -> .identifier : ?\n?
+
+<args> -> <arg> ?, <args>?
+
+<arg> -> <location>
+<arg> -> <immediate>
 
 <immediate> -> # .numericLiteral ?[ .numericLiteral ]?
 
@@ -40,6 +45,3 @@
 
 <variable> -> .identifier ?= .numericLiteral?
 <variable> -> .identifier ?= .charLiteral?
-
-
-

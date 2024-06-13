@@ -65,7 +65,7 @@ public class Lexer {
         pos += off
     }
     
-    
+    /// Generate an array of tokens from a file
     public func tokenize(file: File) throws -> [Token]{
         
         assert(file.fileType != fileType)
@@ -82,6 +82,7 @@ public class Lexer {
         }
     }
     
+    /// Tokenize ash file
     func tokenizeAsh() throws-> [Token] {
         var tokens = [Token]()
         while isAvaiable() {
@@ -100,7 +101,7 @@ public class Lexer {
                 pop()
                 
             // Whitespace
-            case " ":
+            case " ", "\t":
                 pop()
                 
             // Punctuation
@@ -114,7 +115,7 @@ public class Lexer {
                 try tokens.append(handleNumericLiteral())
             
             // Word
-            case "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "x", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V","W" ,"X", "Y", "Z", "_":
+            case "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V","W" ,"X", "Y", "Z", "_":
                 try tokens.append(handleWord())
                 
             case "#", "=":
@@ -127,7 +128,7 @@ public class Lexer {
     }
     
     
-    
+    /// Tokenize asm file
     func tokenizeAsm() throws -> [Token] {
         var tokens = [Token]()
         while isAvaiable() {
@@ -146,12 +147,12 @@ public class Lexer {
                 pop()
                 
             // Whitespace
-            case " ":
+            case " ", "\t":
                 pop()
                 break
                 
             // Punctuation
-            case "{", "}", "[", "]", "(", ")", ":", ",":
+            case "{", "}", "[", "]", "(", ")", ":", ",", ";", ".":
                 tokens.append(handlePunctuation())
             
             
@@ -177,7 +178,7 @@ public class Lexer {
         return tokens
     }
     
-    
+    /// Handle comment
     func handleComment() {
         while (char() != "\n" && pos < chars.count) {
             pop()
@@ -185,7 +186,7 @@ public class Lexer {
     }
     
     
-    
+    ///  handle punctuation
     func handlePunctuation() -> Token {
         let token = Token(lexeme: String(char()!), kind: .punctuation, line: line)
         pop()
@@ -206,7 +207,7 @@ public class Lexer {
         throw LexerError(line: line, kind: .invalidCharLiteral)
     }
     
-    
+    /// Handle numeric literal
     func handleNumericLiteral() throws -> Token {
         var radix: String = "0d"
         var sign: String = ""
@@ -253,7 +254,7 @@ public class Lexer {
         
     }
     
-    
+    /// Handle keyword, instruction, identifier
     func handleWord() throws -> Token {
         var content = String()
         while let char = char(), Resources.validLabelCharacters.contains(char) {
@@ -270,7 +271,7 @@ public class Lexer {
         return Token(lexeme: content, kind: .identifier, line: line)
     }
     
-    
+    /// Handle operator
     func handleOperator() -> Token {
         let token = Token(lexeme: String(char()!), kind: .operator, line: line)
         pop()

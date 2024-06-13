@@ -30,13 +30,13 @@ public struct Token: CustomStringConvertible {
             case .numericLiteral: return "numeric literal"
             case .identifier: return "identifier"
             case .punctuation: return "punctuation"
-            case .operator: return "operator"
+            case .`operator`: return "operator"
             case .eof: return "eof"
             }
         }
     }
     
     public var description: String {
-        "Line \(line): \(lexeme) - \(kind)\n"
+        "Line \(line): \(lexeme) - \(kind)"
     }
 }
