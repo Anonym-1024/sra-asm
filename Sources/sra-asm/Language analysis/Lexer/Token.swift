@@ -20,6 +20,7 @@ public struct Token: CustomStringConvertible {
         case identifier
         case punctuation
         case `operator`
+        case url
         case eof
         
         var description: String {
@@ -31,6 +32,7 @@ public struct Token: CustomStringConvertible {
             case .identifier: return "identifier"
             case .punctuation: return "punctuation"
             case .`operator`: return "operator"
+            case .url: return "url"
             case .eof: return "eof"
             }
         }

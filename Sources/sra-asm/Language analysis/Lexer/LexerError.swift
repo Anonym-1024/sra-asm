@@ -23,6 +23,8 @@ struct LexerError: CompilerError {
             return "Invalid character literal"
         case .invalidNumericLiteral:
             return "Invalid numeric literal"
+        case .invalidUrl:
+            return "Invalid URL"
         }
     }
     
@@ -32,5 +34,6 @@ struct LexerError: CompilerError {
         case invalidCharacter
         case invalidCharLiteral
         case invalidNumericLiteral
+        case invalidUrl
     }
 }

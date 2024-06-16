@@ -125,7 +125,7 @@ public class Parser {
     
     
     
-    func parse(_ tokens: [Token]) throws -> AST {
+    public func parse(_ tokens: [Token]) throws -> AST {
         self.tokens = tokens
         self.pos = 0
         self.errors = []
@@ -135,7 +135,7 @@ public class Parser {
         if fileType == .asm {
             return .init(fileType: .asm, root: try parseAsm())
         } else {
-            return .init(fileType: .ash, root: try parseAsm())
+            return .init(fileType: .ash, root: try parseAsh())
         }
     }
     
@@ -146,7 +146,7 @@ public class Parser {
     // ------ Parsing ASM -------
     
     
-    public func parseAsm() throws -> AST.Node {
+    func parseAsm() throws -> AST.Node {
         parsing.append(.asm)
         defer {
             parsing.removeLast()
@@ -158,7 +158,7 @@ public class Parser {
             children.append(sections)
         }
         
-        guard let eof = popTerminal(kind: .eof) else { throw error(.expectedTerminalOfKind(.eof)) }
+        guard popTerminal(kind: .eof) != nil else { throw error(.expectedTerminalOfKind(.eof)) }
     
         
         
@@ -227,13 +227,13 @@ public class Parser {
         guard let exec = popTerminal("exec") else { throw error(.expectedTerminal("exec")) }
         children.append(.terminal(exec))
         
-        guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
+        guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
         
         if let functions = try? parseFunctions() {
             children.append(functions)
         }
         
-        guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
+        guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
         
         
         return .nonTerminal(.exec, children: children)
@@ -274,13 +274,13 @@ public class Parser {
         if let main = popTerminal("main") {
             children.append(.terminal(main))
             
-            guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
+            guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
             
             if let instructions = try? parseInstructions() {
                 children.append(instructions)
             }
             
-            guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
+            guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
             
         } else {
             guard let identifier = popTerminal(kind: .identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
@@ -297,13 +297,13 @@ public class Parser {
                 pos += 1
             }
             
-            guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
+            guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
             
             if let instructions = try? parseInstructions() {
                 children.append(instructions)
             }
             
-            guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
+            guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
         }
         
         
@@ -353,7 +353,7 @@ public class Parser {
         guard let identifier = popTerminal(kind: .identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
         children.append(.terminal(identifier))
         
-        if let dot = try? popTerminal(".") {
+        if popTerminal(".") != nil {
             
             let location = try parseLocation()
             children.append(location)
@@ -429,9 +429,9 @@ public class Parser {
         guard let identifier = popTerminal(kind: .identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
         children.append(.terminal(identifier))
         
-        guard let colon = popTerminal(":") else { throw error(.expectedTerminal(":")) }
+        guard popTerminal(":") != nil else { throw error(.expectedTerminal(":")) }
         
-        popNewLine()
+        _ = popNewLine()
         
         
         return .nonTerminal(.label, children: children)
@@ -497,12 +497,12 @@ public class Parser {
         guard let numericLiteral = popTerminal(kind: .numericLiteral) else { throw error(.expectedTerminalOfKind(.numericLiteral)) }
         children.append(.terminal(numericLiteral))
         
-        if let bracketL = popTerminal("[") {
+        if popTerminal("[") != nil {
             
             guard let numericLiteral_ = popTerminal(kind: .numericLiteral) else { throw error(.expectedTerminalOfKind(.numericLiteral)) }
             children.append(.terminal(numericLiteral_))
             
-            guard let bracketR = popTerminal("]") else { throw error(.expectedTerminal("]")) }
+            guard popTerminal("]") != nil else { throw error(.expectedTerminal("]")) }
         }
         
         return .nonTerminal(.immediate, children: children)
@@ -520,13 +520,13 @@ public class Parser {
         guard let data = popTerminal("data") else { throw error(.expectedTerminal("data")) }
         children.append(.terminal(data))
         
-        guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
+        guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
         
         if let dataBlocks = try? parseDataBlocks() {
             children.append(dataBlocks)
         }
         
-        guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
+        guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
         
         return .nonTerminal(.data, children: children)
     }
@@ -567,7 +567,7 @@ public class Parser {
             guard let identifier = popTerminal(kind: .identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
             children.append(.terminal(identifier))
             
-            guard let braceL = popTerminal("{") else { throw error(.expectedTerminal("{")) }
+            guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
             
             if let variables = try? parseVariables() {
                 children.append(variables)
@@ -575,9 +575,9 @@ public class Parser {
             
             
             
-            guard let braceR = popTerminal("}") else { throw error(.expectedTerminal("}")) }
+            guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
             
-            parseBreak()
+            _ = parseBreak()
         } else {
             let variables = try parseVariables()
             children.append(variables)
@@ -598,10 +598,11 @@ public class Parser {
         
         if let variable = try? parseVariable() {
             children.append(variable)
-            
-            while parseBreak(), let variable_ = try? parseVariable() {
+            if !parseBreak() { throw error(.expectedTerminal(";")) }
+            while let variable_ = try? parseVariable() {
                 
                 children.append(variable_)
+                if !parseBreak() { throw error(.expectedTerminal(";")) }
             }
         } else {
             throw error(.expectedNonTerminal(.variable))
@@ -645,44 +646,225 @@ public class Parser {
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     // ------ Parsing ASM -------
     
-    /*
+    
     func parseAsh() throws -> AST.Node {
+        parsing.append(.ash)
+        defer {
+            parsing.removeLast()
+        }
         
+        var children = [AST.Node]()
+        
+        let header = try parseHeader()
+        children.append(header)
+        
+        let compile = try parseCompile()
+        children.append(compile)
+        
+        let link = try parseLink()
+        children.append(link)
+        
+        let include = try parseInclude()
+        children.append(include)
+        
+        return .nonTerminal(.ash, children: children)
     }
     
     func parseHeader() throws -> AST.Node {
+        parsing.append(.header)
+        defer {
+            parsing.removeLast()
+        }
         
+        var children = [AST.Node]()
+        
+        guard let header = popTerminal("header") else { throw error(.expectedTerminal("header")) }
+        children.append(.terminal(header))
+        
+        guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
+        
+        guard let name = popTerminal("name") else { throw error(.expectedTerminal("name")) }
+        children.append(.terminal(name))
+        
+        guard popTerminal(":") != nil else { throw error(.expectedTerminal(":")) }
+        
+        guard let identifier = popTerminal(kind: .identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
+        children.append(.terminal(identifier))
+        
+        guard parseBreak() else { throw error(.expectedNonTerminal(.break)) }
+        
+        guard let name = popTerminal("product") else { throw error(.expectedTerminal("product")) }
+        children.append(.terminal(name))
+        
+        guard popTerminal(":") != nil else { throw error(.expectedTerminal(":")) }
+        
+        if let lib = popTerminal("lib") {
+            children.append(.terminal(lib))
+        } else if let exec = popTerminal("exec") {
+            children.append(.terminal(exec))
+        } else {
+            throw error(.expectedTerminal("lib/exec"))
+        }
+        
+        guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
+        
+        return .nonTerminal(.header, children: children)
     }
     
     func parseCompile() throws -> AST.Node {
+        parsing.append(.compile)
+        defer {
+            parsing.removeLast()
+        }
         
+        var children = [AST.Node]()
+        
+        guard let compile = popTerminal("compile") else { throw error(.expectedTerminal("compile")) }
+        children.append(.terminal(compile))
+        
+        guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
+        
+        let urls = parseUrls()
+        children.append(urls)
+        
+        
+        guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
+        
+        return .nonTerminal(.compile, children: children)
     }
     
-    func parseUrls() throws -> AST.Node {
+    func parseUrls() -> AST.Node {
+        parsing.append(.urls)
+        defer {
+            parsing.removeLast()
+        }
         
+        var children = [AST.Node]()
+        
+        if let url = popTerminal(kind: .url) {
+            children.append(.terminal(url))
+            
+            while parseBreak(), let url_ = popTerminal(kind: .url) {
+                children.append(.terminal(url_))
+            }
+        }
+        
+        return .nonTerminal(.urls, children: children)
     }
     
-    func parseUrl() throws -> AST.Node {
-        
-    }
+    
     
     func parseLink() throws -> AST.Node {
+        parsing.append(.link)
+        defer {
+            parsing.removeLast()
+        }
         
+        var children = [AST.Node]()
+        
+        guard let link = popTerminal("link") else { throw error(.expectedTerminal("link")) }
+        children.append(.terminal(link))
+        
+        guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
+        
+        let dLibs = parseDLibs()
+        children.append(dLibs)
+        
+        
+        guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
+        
+        return .nonTerminal(.link, children: children)
     }
     
-    func parseDLibs() throws -> AST.Node {
+    func parseDLibs() -> AST.Node {
+        parsing.append(.dLibs)
+        defer {
+            parsing.removeLast()
+        }
         
+        var children = [AST.Node]()
+        
+        if let dLib = try? parseDLib() {
+            children.append(dLib)
+            
+            while parseBreak(), let dLib_ = try? parseDLib() {
+                children.append(dLib_)
+            }
+        }
+        
+        return .nonTerminal(.dLibs, children: children)
     }
     
     func parseDLib() throws -> AST.Node {
+        parsing.append(.dLib)
+        defer {
+            parsing.removeLast()
+        }
         
+        var children = [AST.Node]()
+        
+        
+        
+        guard popTerminal("[") != nil else { throw error(.expectedTerminal("{")) }
+        
+        guard let numberSign = popTerminal("#") else { throw error(.expectedTerminal("#")) }
+        children.append(.terminal(numberSign))
+        
+        if let numericLiteral = popTerminal(kind: .numericLiteral) {
+            children.append(.terminal(numericLiteral))
+            
+            guard popTerminal(";") != nil else { throw error(.expectedTerminal(";")) }
+            
+            guard let url = popTerminal(kind: .url) else { throw error(.expectedTerminalOfKind(.url)) }
+            children.append(.terminal(url))
+        } else if let keyword = popTerminal(kind: .keyword) {
+            children.append(.terminal(keyword))
+        } else {
+            throw error(.expectedTerminalOfKind(.numericLiteral))
+        }
+        
+        
+        guard popTerminal("]") != nil else { throw error(.expectedTerminal("}")) }
+        
+        return .nonTerminal(.dLib, children: children)
     }
     
     func parseInclude() throws -> AST.Node {
+        parsing.append(.include)
+        defer {
+            parsing.removeLast()
+        }
         
-    }*/
+        var children = [AST.Node]()
+        
+        guard let include = popTerminal("include") else { throw error(.expectedTerminal("include")) }
+        children.append(.terminal(include))
+        
+        guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
+        
+        let urls = parseUrls()
+        children.append(urls)
+        
+        
+        guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
+        
+        return .nonTerminal(.include, children: children)
+    }
     
     
 }

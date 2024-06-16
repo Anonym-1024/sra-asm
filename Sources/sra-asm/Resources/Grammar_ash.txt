@@ -1,20 +1,18 @@
 <ash> -> <header> <compile> <link> <include>
 
-<header> -> { name : .identifier \n product: lib}
-<header> -> { name : .identifier \n product: exec}
+<header> -> header { name : .identifier \n product: lib}
+<header> -> header { name : .identifier \n product: exec}
 
-<compile> -> { ?<urls>? }
+<compile> -> compile { ?<urls>? }
 
-<urls> -> <url> ?\n? <urls>
+<urls> -> .url. ?<break> .url.?
 
-<url> -> // Special
+<link> -> link { ?<d-libs>? }
 
-<link> -> { ?<d-libs>? }
+<d-libs> -> <d-lib> ?<break> <d-lib>?
 
-<d-libs> -> <d-lib> ?\n <d-libs>?
-
-<d-lib> -> [ # .numericLiteral, <url>]
+<d-lib> -> [ # .numericLiteral; <url>]
 <d-lib> -> [ # .keyword]
 
-<include> -> { ?<urls>? }
+<include> -> include { ?<urls>? }
 

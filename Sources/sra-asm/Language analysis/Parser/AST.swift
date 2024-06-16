@@ -9,8 +9,8 @@ import Foundation
 import ArgumentParser
 
 public struct AST {
-    let fileType: File.FileType
-    let root: Node
+    public let fileType: File.FileType
+    public let root: Node
     
     public struct Node {
         var isTerminal: Bool
@@ -20,6 +20,7 @@ public struct AST {
         
         enum NonTerminal {
             case asm, sections, section, exec, functions, function, funcArgs, funcArg, location, instructions, instruction, `break`, label, args, arg, immediate, data, dataBlocks, dataBlock, variables, variable
+            case ash, header, compile, urls, url, link, dLib, dLibs, include
         }
         
         static func terminal(_ content: Token) -> Self {

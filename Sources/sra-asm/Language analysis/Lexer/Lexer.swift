@@ -68,7 +68,7 @@ public class Lexer {
     /// Generate an array of tokens from a file
     public func tokenize(file: File) throws -> [Token]{
         
-        assert(file.fileType != fileType)
+        assert(file.fileType == fileType)
         
         self.chars = .init(file.content)
         self.line = 1
@@ -105,7 +105,7 @@ public class Lexer {
                 pop()
                 
             // Punctuation
-            case "{", "}", ":", ",":
+            case "{", "}", ":", ",", ";", "[", "]":
                 tokens.append(handlePunctuation())
             
             
@@ -118,6 +118,8 @@ public class Lexer {
             case "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V","W" ,"X", "Y", "Z", "_":
                 try tokens.append(handleWord())
                 
+            case "\"":
+                try tokens.append(handleUrl())
             case "#", "=":
                 tokens.append(handleOperator())
             default:
@@ -276,6 +278,24 @@ public class Lexer {
         let token = Token(lexeme: String(char()!), kind: .operator, line: line)
         pop()
         return token
+    }
+    
+    /// Handle URL
+    func handleUrl() throws -> Token {
+        var string = ""
+        
+        pop()
+        while let char = char(), char != "\"" {
+           
+            string.append(char)
+            pop()
+        }
+        if let char = char(), char == "\"" {
+            pop()
+            return .init(lexeme: string, kind: .url, line: line)
+        }
+        
+        throw LexerError(line: line, kind: .invalidUrl)
     }
     
 }
