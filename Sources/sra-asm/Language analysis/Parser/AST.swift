@@ -33,19 +33,18 @@ public struct AST {
         
         public func stringRep(level: Int) -> String {
             var string = ""
-            var l = level
             if isTerminal {
-                for _ in 0..<l {
+                for _ in 0..<(level) {
                     string.append("|   ")
                 }
                 string.append("\(terminal!)\n")
             } else {
-                for _ in 0...l {
+                for _ in 0..<(level) {
                     string.append("|   ")
                 }
                 string.append("Non-terminal: \(nonterminal!)\n")
                 for child in children ?? [] {
-                    string.append(child.stringRep(level: l+1))
+                    string.append(child.stringRep(level: level+1))
                 }
             }
             return string

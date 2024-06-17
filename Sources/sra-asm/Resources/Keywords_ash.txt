@@ -6,3 +6,6 @@ name
 product
 exec
 lib
+math
+core
+array

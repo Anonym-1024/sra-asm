@@ -154,9 +154,8 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        if let sections = try? parseSections() {
-            children.append(sections)
-        }
+        let sections = parseSections()
+        children.append(sections)
         
         guard popTerminal(kind: .eof) != nil else { throw error(.expectedTerminalOfKind(.eof)) }
     
@@ -166,7 +165,7 @@ public class Parser {
     }
     
     
-    func parseSections() throws -> AST.Node {
+    func parseSections() -> AST.Node {
         parsing.append(.sections)
         defer {
             parsing.removeLast()
@@ -180,10 +179,7 @@ public class Parser {
             while popNewLine(), let section_ = try? parseSection() {
                 children.append(section_)
             }
-        } else {
-            throw error(.expectedNonTerminal(.section))
         }
-        //
         
         
         
@@ -194,6 +190,7 @@ public class Parser {
     
     
     func parseSection() throws -> AST.Node {
+        
         parsing.append(.section)
         defer {
             parsing.removeLast()
@@ -229,9 +226,8 @@ public class Parser {
         
         guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
         
-        if let functions = try? parseFunctions() {
-            children.append(functions)
-        }
+        let functions =  parseFunctions()
+        children.append(functions)
         
         guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
         
@@ -240,7 +236,7 @@ public class Parser {
     }
     
     
-    func parseFunctions() throws -> AST.Node {
+    func parseFunctions() -> AST.Node {
         parsing.append(.functions)
         defer {
             parsing.removeLast()
@@ -254,8 +250,6 @@ public class Parser {
             while popNewLine(), let function_ = try? parseFunction() {
                 children.append(function_)
             }
-        }  else {
-            throw error(.expectedNonTerminal(.function))
         }
         
         
@@ -276,16 +270,14 @@ public class Parser {
             
             guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
             
-            if let instructions = try? parseInstructions() {
-                children.append(instructions)
-            }
+            let instructions = parseInstructions()
+            children.append(instructions)
             
             guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
             
         } else {
             guard let identifier = popTerminal(kind: .identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
             children.append(.terminal(identifier))
-            
             while lookAhead("(") {
                 while !lookAhead(")") {
                     if pos < tokens.count {
@@ -298,10 +290,9 @@ public class Parser {
             }
             
             guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
+            let instructions = parseInstructions()
+            children.append(instructions)
             
-            if let instructions = try? parseInstructions() {
-                children.append(instructions)
-            }
             
             guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
         }
@@ -313,34 +304,7 @@ public class Parser {
     }
     
     
-    /*func parseFuncArgs() throws -> AST.Node {
-        parsing.append(.funcArgs)
-        defer {
-            parsing.removeLast()
-        }
-        
-        var children = [AST.Node]()
-        
-        
-        
-        
-        return .nonTerminal(.funcArgs, children: children)
-    }
-    
-    
-    func parseFuncArg() throws -> AST.Node {
-        parsing.append(.funcArg)
-        defer {
-            parsing.removeLast()
-        }
-        
-        var children = [AST.Node]()
-        
-        
-        
-        return .nonTerminal(.funcArg, children: children)
-    }*/
-    
+
     
     func parseLocation() throws -> AST.Node {
         parsing.append(.location)
@@ -363,7 +327,7 @@ public class Parser {
     }
     
     
-    func parseInstructions() throws -> AST.Node {
+    func parseInstructions() -> AST.Node {
         parsing.append(.instructions)
         defer {
             parsing.removeLast()
@@ -377,8 +341,6 @@ public class Parser {
             while parseBreak(), let instruction_ = try? parseInstruction() {
                 children.append(instruction_)
             }
-        } else {
-            throw error(.expectedNonTerminal(.instruction))
         }
         
         return .nonTerminal(.instructions, children: children)
@@ -386,6 +348,7 @@ public class Parser {
     
     
     func parseInstruction() throws -> AST.Node {
+        
         parsing.append(.instruction)
         defer {
             parsing.removeLast()
@@ -402,9 +365,9 @@ public class Parser {
         guard let instruction = popTerminal(kind: .instruction) else { throw error(.invalidInstruction) }
         children.append(.terminal(instruction))
         
-        if let args = try? parseArgs() {
-            children.append(args)
-        }
+        let args = parseArgs()
+        children.append(args)
+        
         
         return .nonTerminal(.instruction, children: children)
     }
@@ -438,7 +401,7 @@ public class Parser {
     }
     
     
-    func parseArgs() throws -> AST.Node {
+    func parseArgs() -> AST.Node {
         parsing.append(.args)
         defer {
             parsing.removeLast()
@@ -452,8 +415,6 @@ public class Parser {
             while popTerminal(",") != nil, let arg_ = try? parseArg() {
                 children.append(arg_)
             }
-        }  else {
-            throw error(.expectedNonTerminal(.arg))
         }
         
         return .nonTerminal(.args, children: children)
@@ -522,9 +483,9 @@ public class Parser {
         
         guard popTerminal("{") != nil else { throw error(.expectedTerminal("{")) }
         
-        if let dataBlocks = try? parseDataBlocks() {
-            children.append(dataBlocks)
-        }
+        let dataBlocks = parseDataBlocks()
+        children.append(dataBlocks)
+        
         
         guard popTerminal("}") != nil else { throw error(.expectedTerminal("}")) }
         
@@ -532,7 +493,7 @@ public class Parser {
     }
     
     
-    func parseDataBlocks() throws -> AST.Node {
+    func parseDataBlocks() -> AST.Node {
         parsing.append(.dataBlocks)
         defer {
             parsing.removeLast()
@@ -546,8 +507,6 @@ public class Parser {
             while let dataBlock_ = try? parseDataBlock() {
                 children.append(dataBlock_)
             }
-        }  else {
-            throw error(.expectedNonTerminal(.dataBlock))
         }
         
         
@@ -673,14 +632,17 @@ public class Parser {
         let header = try parseHeader()
         children.append(header)
         
-        let compile = try parseCompile()
-        children.append(compile)
+        if let compile = try? parseCompile() {
+            children.append(compile)
+        }
         
-        let link = try parseLink()
-        children.append(link)
-        
-        let include = try parseInclude()
-        children.append(include)
+        if let include = try? parseInclude() {
+            children.append(include)
+        }
+    
+        if let link = try? parseLink() {
+            children.append(link)
+        }
         
         return .nonTerminal(.ash, children: children)
     }

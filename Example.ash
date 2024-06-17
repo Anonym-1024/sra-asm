@@ -8,15 +8,15 @@ header {
 }
 
 compile {
-    Example.asm
+    "Example.asm"
 }
 
 link {
-    [#Math]
-    [#12, /.../DynamicLib.asl]
+    [#math]
+    [#12; "/.../DynamicLib.asl"]
 }
 
 
 include {
-    /.../StaticLib.asl
+    "/.../StaticLib.asl"
 }
