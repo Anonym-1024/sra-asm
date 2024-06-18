@@ -1,9 +1,7 @@
 //
 //  Token.swift
 //  
-//
-//  
-//
+
 
 import Foundation
 

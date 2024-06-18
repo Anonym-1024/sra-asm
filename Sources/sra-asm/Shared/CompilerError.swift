@@ -1,9 +1,7 @@
 //
+// CompilerError.swift
 //
-//  
-//
-//
-//
+
 
 import Foundation
 

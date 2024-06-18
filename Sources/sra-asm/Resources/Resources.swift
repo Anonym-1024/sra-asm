@@ -1,9 +1,7 @@
 //
-//  Resources.swift
-//  
+// Resources.swift
 //
-//  Created by Václav Koukola on 08.10.2023.
-//
+
 
 import Foundation
 

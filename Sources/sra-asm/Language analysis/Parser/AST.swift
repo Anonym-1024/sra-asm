@@ -1,12 +1,9 @@
 //
-//  File.swift
-//  
-//
-//  Created by Václav Koukola on 11.05.2024.
+// AST.swift
 //
 
+
 import Foundation
-import ArgumentParser
 // TODO: Remove public from Node, root and stringRep(level: Int)
 
 

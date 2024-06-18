@@ -1,9 +1,7 @@
 //
+// LexerError.swift
 //
-//  
-//
-//
-//
+
 
 import Foundation
 
