@@ -7,19 +7,23 @@
 
 import Foundation
 
+
+
+/// Syntax analyzer
 public class Parser {
-    public init(fileType: File.FileType) {
+    
+    /// Initialize a Lexer
+    public init() {
         self.tokens = []
         self.pos = 0
-        self.fileType = fileType
         self.errors = []
         self.parsing = []
     }
     
     
-    public var tokens: [Token]
+    var tokens: [Token]
     var pos: Int
-    var fileType: File.FileType
+    var fileType: File.FileType!
     public var errors: [ParserError]
     
     var parsing: [AST.Node.NonTerminal]
@@ -124,8 +128,14 @@ public class Parser {
     
     
     
-    
-    public func parse(_ tokens: [Token]) throws -> AST {
+    /// Builds an abstract syntax tree and performs syntax analysis
+    /// - Parameter tokens: Tokens to be parsed
+    /// - Parameter type: File type of parsed file
+    /// - Returns: Generated abstract syntax tree
+    /// - Throws: Throws ParserError
+    public func parse(_ tokens: [Token], of type: File.FileType) throws -> AST {
+        
+        self.fileType = type
         self.tokens = tokens
         self.pos = 0
         self.errors = []
@@ -176,7 +186,7 @@ public class Parser {
         if let section = try? parseSection() {
             children.append(section)
             
-            while popNewLine(), let section_ = try? parseSection() {
+            while parseBreak(), let section_ = try? parseSection() {
                 children.append(section_)
             }
         }
@@ -247,7 +257,7 @@ public class Parser {
         if let function = try? parseFunction() {
             children.append(function)
             
-            while popNewLine(), let function_ = try? parseFunction() {
+            while parseBreak(), let function_ = try? parseFunction() {
                 children.append(function_)
             }
         }
@@ -409,7 +419,7 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        if let arg = try? parseArg() {
+        if !lookAhead(offset: 1, ":"), let arg = try? parseArg() {
             children.append(arg)
             
             while popTerminal(",") != nil, let arg_ = try? parseArg() {

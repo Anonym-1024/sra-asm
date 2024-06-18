@@ -8,7 +8,7 @@
 import Foundation
 
 struct LexerError: CompilerError {
-    public init(line: Int, kind: LexerError.Kind) {
+    init(line: Int, kind: LexerError.Kind) {
         self.line = line
         self.kind = kind
     }

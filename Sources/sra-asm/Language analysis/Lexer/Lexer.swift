@@ -7,19 +7,21 @@
 
 import Foundation
 
+/// Lexical analyzer
 public class Lexer {
-    public init(fileType: File.FileType) {
+    
+    /// Initialize a Lexer
+    public init() {
         self.chars = []
         self.pos = 0
         self.line = 1
-        self.fileType = fileType
     }
     
     
     var chars: [Character]
     var pos: Int
     var line: Int
-    var fileType: File.FileType
+    var fileType: File.FileType!
 
     // Helpers
     
@@ -66,19 +68,23 @@ public class Lexer {
     }
     
     /// Generate an array of tokens from a file
+    /// - Parameter file: File to tokenize
+    /// - Returns: Array of tokens
+    /// - Throws: Throws LexerError
     public func tokenize(file: File) throws -> [Token]{
         
-        assert(file.fileType == fileType)
         
+        self.fileType = file.fileType
         self.chars = .init(file.content)
         self.line = 1
         self.pos = 0
         
-        switch fileType {
+        switch fileType! {
         case .ash:
             return try tokenizeAsh()
         case .asm:
             return try tokenizeAsm()
+            
         }
     }
     

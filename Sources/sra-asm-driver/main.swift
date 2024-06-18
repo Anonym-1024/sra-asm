@@ -11,12 +11,13 @@ import sra_asm
 
 
 let g = File(url: .init(fileURLWithPath: "/Users/vasik/Desktop/kopec_"), fileType: .asm)
-let h = try Lexer(fileType: .asm).tokenize(file: g)
-var f = Parser(fileType: .asm)
-f.tokens = h
+let h = try Lexer().tokenize(file: g)
+var f = Parser()
 do {
-    print(try f.parse(h).root.stringRep(level: 0))
+    print(try f.parse(h, of: .asm).strRep)
 } catch {
     print(f.errors)
 }
+
+
 
