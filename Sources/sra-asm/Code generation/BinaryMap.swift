@@ -1,0 +1,6 @@
+//
+// BinaryMap.swift
+//
+
+
+import Foundation

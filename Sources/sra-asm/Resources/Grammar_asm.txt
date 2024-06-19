@@ -16,7 +16,7 @@
 
 <func-arg> -> .identifier : <location>
 
-<location> -> .identifier ?. <location>?
+<location> -> ?#? .identifier ?. <location>? ?[ .identifier ]?
 
 <instructions> -> <instruction> *<break> <instruction>*
 

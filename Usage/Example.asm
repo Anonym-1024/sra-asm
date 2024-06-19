@@ -16,7 +16,7 @@ exec {
 }
 
 data {
-    main {
+    section {
         var1
         var2 = 2762
         var3 = "k"

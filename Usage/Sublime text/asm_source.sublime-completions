@@ -1,0 +1,22 @@
+{
+    "scope": "asm.source",
+    "completions": [
+        {
+            "trigger": "exec",
+            "contents": "exec",
+            "kind": "keyword"
+        }, 
+
+        {
+            "trigger": "data",
+            "contents": "data",
+            "kind": "keyword"
+        },
+
+        {
+            "trigger": "main",
+            "contents": "main",
+            "kind": "keyword"
+        }
+    ]
+}

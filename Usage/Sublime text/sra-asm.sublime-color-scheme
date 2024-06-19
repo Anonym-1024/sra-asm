@@ -1,0 +1,94 @@
+{
+    "name": "sra-asm",
+    "globals":
+    {
+        "background": "rgb(10, 40, 50)",
+        "foreground": "#FFFFFF",
+        "caret": "white",
+        "selection": "rgba(250, 250, 250, 0.2)"
+    },
+    "rules":
+    [
+        {
+            "scope": "asm.instruction",
+            "foreground": "rgb(50, 200, 50)"
+        },
+
+        {
+            "scope": "asm.keyword",
+            "foreground": "rgb(200, 150, 250)"
+        },
+
+        {
+            "scope": "asm.number",
+            "foreground": "rgb(50, 250, 250)"
+        },
+
+        {
+            "scope": "asm.register",
+            "foreground": "rgb(250, 200, 0)"
+        },
+
+         {
+            "scope": "asm.port",
+            "foreground": "rgb(250, 200, 0)"
+        },
+
+        {
+            "scope": "asm.comment",
+            "foreground": "rgb(100, 120, 140)"
+        },
+        
+        {
+            "scope": "asm.identifier",
+            "foreground": "rgb(150, 200, 250)"
+        },
+
+        {
+            "scope": "asm.label",
+            "foreground": "rgb(255, 100, 100)"
+        },
+
+        {
+            "scope": "asm.char",
+            "foreground": "rgb(250, 200, 0)"
+        },
+
+
+
+
+
+        {
+            "scope": "ash.identifier",
+            "foreground": "rgb(150, 200, 250)"
+        },
+
+        {
+            "scope": "ash.number",
+            "foreground": "rgb(50, 250, 250)"
+        },
+
+        {
+            "scope": "ash.keyword",
+            "foreground": "rgb(200, 150, 250)"
+        },
+
+        {
+            "scope": "ash.url",
+            "foreground": "rgb(250, 200, 0)"
+        },
+
+        {
+            "scope": "ash.predefined",
+            "foreground": "rgb(255, 100, 100)"
+        },
+
+        {
+            "scope": "ash.comment",
+            "foreground": "rgb(140, 160, 180)"
+        },
+
+        
+    ]
+}
+

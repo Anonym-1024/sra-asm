@@ -5,6 +5,4 @@
 
 import Foundation
 
-struct Binary {
-    
-}
+typealias Binary = Data

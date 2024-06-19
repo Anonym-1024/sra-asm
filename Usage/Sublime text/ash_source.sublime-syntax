@@ -1,0 +1,31 @@
+%YAML 1.2
+---
+name: ASH
+file_extensions: 
+  - ash
+scope: ash.source
+
+contexts:
+  main:
+    - match: (?i)\b(header|compile|link|include|name|product)\b(?-i)
+      scope: ash.keyword
+
+    - match: \b(exec|lib)\b
+      scope: ash.predefined
+
+    - match: (//[A-z0-9 ]*)
+      scope: ash.comment
+
+    - match: (#([0-9]|math|core|array)+)
+      scope: ash.number
+
+    - match: \"(.*)\"
+      scope: ash.url
+
+    - match: ([a-zA-Z_][a-zA-Z0-9_]*)
+      scope: ash.identifier
+
+  
+
+
+

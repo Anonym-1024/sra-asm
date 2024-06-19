@@ -1,0 +1,70 @@
+{
+    "scope": "ash.source",
+    "completions": [
+        {
+            "trigger": "header",
+            "contents": "header",
+            "kind": "keyword"
+        }, 
+
+        {
+            "trigger": "compile",
+            "contents": "compile",
+            "kind": "keyword"
+        },
+
+        {
+            "trigger": "name",
+            "contents": "name",
+            "kind": "keyword"
+        }, 
+
+        {
+            "trigger": "product",
+            "contents": "product",
+            "kind": "keyword"
+        },
+
+        {
+            "trigger": "link",
+            "contents": "link",
+            "kind": "keyword"
+        },
+
+        {
+            "trigger": "include",
+            "contents": "include",
+            "kind": "keyword"
+        },
+
+        {
+            "trigger": "exec",
+            "contents": "exec",
+            "kind": "type"
+        },
+
+        {
+            "trigger": "lib",
+            "contents": "lib",
+            "kind": "type"
+        },
+
+        {
+            "trigger": "#math",
+            "contents": "#math",
+            "kind": "variable"
+        },
+
+        {
+            "trigger": "#core",
+            "contents": "#core",
+            "kind": "variable"
+        },
+
+        {
+            "trigger": "#array",
+            "contents": "#array",
+            "kind": "variable"
+        },
+    ]
+}
