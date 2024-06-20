@@ -6,7 +6,7 @@ scope: asm.source
 
 contexts:
   main:
-    - match: (exec|data|main)
+    - match: (exec|data|main|const)
       scope: asm.keyword
 
     - match: (?i)\b(ldr|str|mov|mvn|srr|srw|sst|ssr|add|sub|rsb|and|orr|xor|lsl|lsr|asl|asr|csl|csr|adds|subs|rsbs|ands|orrs|xors|lsls|lsrs|asls|asrs|csls|csrs|cmn|cmp|rsbd|andd|orrd|xord|lsld|lsrd|asld|asrd|csld|csrd|ior|iow|psr|pop|psh|svc)\b(?-i)

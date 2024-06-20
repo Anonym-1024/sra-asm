@@ -43,5 +43,5 @@
 
 <variables> -> <variable> *<break> <variable>*
 
-<variable> -> .identifier ?= .numericLiteral?
-<variable> -> .identifier ?= .charLiteral?
+<variable> -> ?const? .identifier ?= .numericLiteral?
+<variable> -> ?const? .identifier ?= .charLiteral?

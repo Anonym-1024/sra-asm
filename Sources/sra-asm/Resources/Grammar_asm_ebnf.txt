@@ -1,0 +1,40 @@
+asm = sections , ".eof" ;
+
+sections = section { break section } ;
+
+section = exec | data ;
+
+exec = "exec" "{" functions "}" ;
+
+functions = function { break function } ;
+
+function = "main" { instructions }
+    | ".identifier" "{" instructions "}" ;
+
+instructions = instruction { break instruction } ;
+
+break = "\n" | ";" ;
+
+instruction = [ label ] ".instruction" [ args ] ;
+
+label = ".identifier : ?\n? ;
+
+args = arg { "," arg } ;
+
+arg = location | immediate ;
+
+location = [ "#" ] ".identifier" [ "." location] [ "[" ".identifier" "]" ] ;
+
+immediate = "#" ".numericLiteral" "[" ".numericLiteral" "]" ;
+
+data = "data" "{" data-blocks "}" ;
+
+data-blocks = data-block { "\n" data-block } ;
+
+data-block = variables
+    | ".identifier" { variables } ;
+
+variables = variable { break variable } ;
+
+variable = [ "const" ] ".identifier" [ "=" ".numericLiteral" ] ;
+    | [ "const" ] ".identifier" [ "=" ".charLiteral" ] ;

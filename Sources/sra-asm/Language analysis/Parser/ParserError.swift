@@ -13,8 +13,8 @@ public struct ParserError: CompilerError {
         self.parsing = parsing
     }
     
-    var line: Int
-    var parsing: AST.Node.NonTerminal
+    let line: Int
+    let parsing: AST.Node.NonTerminal
     
     var errorDescription: String {
         switch kind {

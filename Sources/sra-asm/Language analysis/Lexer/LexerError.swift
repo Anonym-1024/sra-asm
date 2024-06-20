@@ -11,7 +11,7 @@ struct LexerError: CompilerError {
         self.kind = kind
     }
     
-    var line: Int
+    let line: Int
     
     var errorDescription: String {
         switch kind {
@@ -26,7 +26,7 @@ struct LexerError: CompilerError {
         }
     }
     
-    var kind: Kind
+    let kind: Kind
     
     enum Kind {
         case invalidCharacter

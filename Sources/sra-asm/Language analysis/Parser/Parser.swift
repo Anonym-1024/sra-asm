@@ -25,9 +25,10 @@ public class Parser {
     public var errors: [ParserError]
     
     var parsing: [AST.Node.NonTerminal]
+    
     var line: Int {
-        if pos < tokens.count {
-            return tokens[pos].line
+        if pos < tokens.count-1 {
+            return tokens[pos+1].line
         }
         return 0
     }
@@ -314,7 +315,7 @@ public class Parser {
     
 
     
-    func parseLocation() throws -> AST.Node {
+    func parseLocation(isFirst: Bool) throws -> AST.Node {
         parsing.append(.location)
         defer {
             parsing.removeLast()
@@ -322,7 +323,7 @@ public class Parser {
         
         var children = [AST.Node]()
         
-        if let numberSign = popTerminal("#") {
+        if isFirst, let numberSign = popTerminal("#") {
             children.append(.terminal(numberSign))
         }
         
@@ -331,7 +332,7 @@ public class Parser {
         
         if popTerminal(".") != nil {
             
-            let location = try parseLocation()
+            let location = try parseLocation(isFirst: false)
             children.append(location)
         } else if popTerminal("[") != nil {
             guard let identifier_ = popTerminal(.identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
@@ -450,7 +451,7 @@ public class Parser {
         var children = [AST.Node]()
         
         if lookAhead(.identifier) || (lookAhead("#") && lookAhead(offset: 1, .identifier)) {
-            let location = try parseLocation()
+            let location = try parseLocation(isFirst: true)
             children.append(location)
         } else if lookAhead("#") {
             let immediate = try parseImmediate()
@@ -604,6 +605,10 @@ public class Parser {
         
         if lookAhead(offset: 1, "{") {
             throw error(.notVariable)
+        }
+        
+        if let const = popTerminal("const") {
+            children.append(.terminal(const))
         }
         
         guard let identifier = popTerminal(.identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }

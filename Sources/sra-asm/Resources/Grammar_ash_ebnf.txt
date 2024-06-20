@@ -1,0 +1,19 @@
+ash = header [ compile ] [ link ] [ include ] ;
+
+break = "\n" | ";" ;
+
+header = "header" "{" "name" ":" ".identifier" break "product" ":" ( "lib" | "exec") "}" ;
+
+compile = compile "{" urls "}" ;
+
+urls = ".url." { break ".url" } ;
+
+link = "link" "{" d-libs "}" ;
+
+d-libs = d-lib { break d-lib } ;
+
+d-lib = "[" "#" ".numericLiteral" ";" "url" "]"
+    | "[" "#" ".keyword" "]" ;
+
+include = "include" "{" urls "}" ;
+

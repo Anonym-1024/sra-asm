@@ -20,7 +20,7 @@ let package = Package(
         .target(
             name: "sra-asm",
             dependencies: [],
-            exclude: ["Resources/Grammar_asm.txt", "Resources/Grammar_ash.txt"],
+            exclude: ["Resources/Grammar_asm.txt", "Resources/Grammar_ash.txt", "Resources/Grammar_asm_ebnf.txt", "Resources/Grammar_ash_ebnf.txt"],
             resources: [.copy("Resources/Instructions.txt"), .copy("Resources/Keywords_asm.txt"), .copy("Resources/Keywords_ash.txt")]
             
             ),

@@ -21,6 +21,24 @@ public struct AST {
         root.stringRep(level: 0)
     }
     
+    init (fileType: File.FileType, root: Node) {
+        self.fileType = fileType
+        self.root = root
+    }
+    
+    
+    /// Create new AST object by combining more ASTs. Only for asm files
+    public init(_ asts: AST...) {
+        var root = Node.nonTerminal(.asm, children: [])
+        for ast in asts {
+            guard ast.fileType == .asm else { fatalError("Cannot combine header files") }
+            
+            root.children!.append(contentsOf: ast.root.children!)
+        }
+        
+        self.fileType = .asm
+        self.root = root
+    }
     
     /// AST Node
     public struct Node {
@@ -46,7 +64,7 @@ public struct AST {
         
         
         /// String representation of a node
-        func stringRep(level: Int) -> String {
+        public func stringRep(level: Int) -> String {
             var string = ""
             if isTerminal {
                 for _ in 0..<(level) {
