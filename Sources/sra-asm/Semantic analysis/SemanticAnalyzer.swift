@@ -53,6 +53,7 @@ public class SemanticAnalyzer {
             errors.append(.init(kind: .missingEntryPoint, line: 0))
         }
         
+        
         // Generate symbol tables
         do {
             self.symbolTable = try generateSymbolTable()
@@ -454,7 +455,7 @@ extension Set where Element == Symbol {
     
     mutating func append(_ remote: SymbolTable, name: String) {
         for newSymbol in remote {
-            self.insert(.init(name: name + newSymbol.name, kind: newSymbol.kind))
+            self.insert(.init(name: name + "." + newSymbol.name, kind: newSymbol.kind))
         }
     }
     

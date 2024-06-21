@@ -5,4 +5,4 @@
 
 import Foundation
 
-typealias Binary = Data
+public typealias Binary = Data

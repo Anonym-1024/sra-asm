@@ -14,7 +14,7 @@ let h1 = try Lexer().tokenize(file: g1)
 let h2 = try Lexer().tokenize(file: g2)
 var f = Parser()
 
-var sem = SemanticAnalyzer(in: .init(libraries: [], product: .exec))
+var sem = SemanticAnalyzer(in: .init(libraries: [.init(name: "knih", symbolTable: [.init(name: "prom", kind: .variable)], binary: .init())], product: .exec))
 do {
     let ast1 = try f.parse(h1, of: .asm)
     let ast2 = try f.parse(h2, of: .asm)

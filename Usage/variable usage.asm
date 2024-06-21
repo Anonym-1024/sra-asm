@@ -28,6 +28,9 @@ exec {
 		sub r0, r7, #"k"
 
 
+		str knih.prom[r0], number[r1]
+
+
 
 		// Using labels
 
