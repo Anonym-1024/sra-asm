@@ -90,6 +90,7 @@ public class Parser {
             _pos += 1
         }
         _pos -= 1
+            
         if _pos + offset < tokens.count {
             let token = tokens[_pos]
             return token.kind == kind
@@ -330,15 +331,19 @@ public class Parser {
         guard let identifier = popTerminal(.identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
         children.append(.terminal(identifier))
         
-        if popTerminal(".") != nil {
+        while popTerminal(".") != nil {
+            guard let identifier_ = popTerminal(.identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
+            children.append(.terminal(identifier_))
+        }
+        
+        if let bracketL = popTerminal("[") {
+            children.append(.terminal(bracketL))
             
-            let location = try parseLocation(isFirst: false)
-            children.append(location)
-        } else if popTerminal("[") != nil {
             guard let identifier_ = popTerminal(.identifier) else { throw error(.expectedTerminalOfKind(.identifier)) }
             children.append(.terminal(identifier_))
             
-            guard popTerminal("]") != nil else { throw error(.expectedTerminal("]")) }
+            guard let bracketR = popTerminal("]") else { throw error(.expectedTerminal("]")) }
+            children.append(.terminal(bracketR))
         }
         
         return .nonTerminal(.location, children: children)
@@ -472,20 +477,23 @@ public class Parser {
         }
         
         var children = [AST.Node]()
+    
         
         guard let numberSign = popTerminal("#") else { throw error(.expectedTerminal("#")) }
+        print(tokens[pos + 1], lookAhead(.charLiteral))
+        guard (lookAhead(offset: 1, "[") || lookAhead(.charLiteral)) == true else { throw error(.expectedTerminal("[")) }
         children.append(.terminal(numberSign))
                                             
         if let numericLiteral = popTerminal(.numericLiteral) {
             children.append(.terminal(numericLiteral))
             
-            if popTerminal("[") != nil {
+            guard popTerminal("[") != nil else { throw error(.expectedTerminal("[")) }
                 
-                guard let numericLiteral_ = popTerminal(.numericLiteral) else { throw error(.expectedTerminalOfKind(.numericLiteral)) }
-                children.append(.terminal(numericLiteral_))
+            guard let numericLiteral_ = popTerminal(.numericLiteral) else { throw error(.expectedTerminalOfKind(.numericLiteral)) }
+            children.append(.terminal(numericLiteral_))
                 
-                guard popTerminal("]") != nil else { throw error(.expectedTerminal("]")) }
-            }
+            guard popTerminal("]") != nil else { throw error(.expectedTerminal("]")) }
+            
         } else if let charLiteral = popTerminal(.charLiteral) {
             children.append(.terminal(charLiteral))
         }

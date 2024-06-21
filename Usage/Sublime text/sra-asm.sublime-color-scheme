@@ -16,22 +16,22 @@
 
         {
             "scope": "asm.keyword",
-            "foreground": "rgb(200, 150, 250)"
+            "foreground": "rgb(150, 150, 250)"
         },
 
         {
             "scope": "asm.number",
-            "foreground": "rgb(50, 250, 250)"
+            "foreground": "rgb(250, 250, 0)"
         },
 
         {
             "scope": "asm.register",
-            "foreground": "rgb(250, 200, 0)"
+            "foreground": "rgb(250, 200, 120)"
         },
 
          {
             "scope": "asm.port",
-            "foreground": "rgb(250, 200, 0)"
+            "foreground": "rgb(250, 200, 120)"
         },
 
         {
@@ -41,7 +41,7 @@
         
         {
             "scope": "asm.identifier",
-            "foreground": "rgb(150, 200, 250)"
+            "foreground": "rgb(150, 250, 250)"
         },
 
         {
@@ -51,7 +51,7 @@
 
         {
             "scope": "asm.char",
-            "foreground": "rgb(250, 200, 0)"
+            "foreground": "rgb(250, 250, 0)"
         },
 
 
@@ -60,12 +60,12 @@
 
         {
             "scope": "ash.identifier",
-            "foreground": "rgb(150, 200, 250)"
+            "foreground": "rgb(150, 250, 250)"
         },
 
         {
             "scope": "ash.number",
-            "foreground": "rgb(50, 250, 250)"
+            "foreground": "rgb(50, 200, 150)"
         },
 
         {
@@ -75,7 +75,7 @@
 
         {
             "scope": "ash.url",
-            "foreground": "rgb(250, 200, 0)"
+            "foreground": "rgb(250, 250, 0)"
         },
 
         {

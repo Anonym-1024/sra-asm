@@ -23,7 +23,7 @@ args = arg { "," arg } ;
 
 arg = location | immediate ;
 
-location = [ "#" ] ".identifier" [ "." location] [ "[" ".identifier" "]" ] ;
+location = [ "#" ] ".identifier" { "." .identifier } [ "[" ".identifier" "]" ] ;
 
 immediate = "#" ".numericLiteral" "[" ".numericLiteral" "]" ;
 

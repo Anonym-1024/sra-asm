@@ -29,16 +29,43 @@ public struct AST {
     
     /// Create new AST object by combining more ASTs. Only for asm files
     public init(_ asts: AST...) {
-        var root = Node.nonTerminal(.asm, children: [])
+        var root = Node.nonTerminal(.asm, children: [.nonTerminal(.sections, children: [])])
         for ast in asts {
             guard ast.fileType == .asm else { fatalError("Cannot combine header files") }
             
-            root.children!.append(contentsOf: ast.root.children!)
+            root.children![0].children!.append(contentsOf: ast.root.children![0].children!)
         }
         
         self.fileType = .asm
         self.root = root
     }
+    
+    
+    public func splitToExecAndData() throws -> (exec: AST.Node, data: AST.Node) {
+        
+        guard self.fileType == .asm, self.root.nonterminal == .asm else { fatalError("Invalid file type") }
+        
+        var exec = AST.Node.nonTerminal(.exec, children: [.nonTerminal(.functions, children: [])])
+        var data = AST.Node.nonTerminal(.data, children: [.nonTerminal(.dataBlocks, children: [])])
+        
+        let asmNode = self.root
+        let sectionsNode = asmNode.children![0]
+    
+        
+        for sectionNode in sectionsNode.children! {
+            if sectionNode.children![0].nonterminal == .exec {
+                let functionsNode = sectionNode.children![0].children![1]
+                exec.children![0].children!.append(contentsOf: functionsNode.children!)
+            } else if sectionNode.children![0].nonterminal == .data {
+                let dataBlocksNode = sectionNode.children![0].children![1]
+                data.children![0].children!.append(contentsOf: dataBlocksNode.children!)
+            }
+        }
+        
+        return (exec: exec, data: data)
+    }
+    
+    
     
     /// AST Node
     public struct Node {

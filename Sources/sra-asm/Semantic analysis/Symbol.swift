@@ -25,8 +25,6 @@ public struct Symbol: Hashable, Equatable, CustomStringConvertible {
         case constant
         case function
         case label
-        case localNamespace
-        case remoteNamespace
     }
     
     public var description: String {

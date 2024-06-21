@@ -21,7 +21,7 @@ let package = Package(
             name: "sra-asm",
             dependencies: [],
             exclude: ["Resources/Grammar_asm.txt", "Resources/Grammar_ash.txt", "Resources/Grammar_asm_ebnf.txt", "Resources/Grammar_ash_ebnf.txt"],
-            resources: [.copy("Resources/Instructions.txt"), .copy("Resources/Keywords_asm.txt"), .copy("Resources/Keywords_ash.txt")]
+            resources: [.copy("Resources/Instructions.txt"), .copy("Resources/Instruction_format.csv"), .copy("Resources/Keywords_asm.txt"), .copy("Resources/Keywords_ash.txt")]
             
             ),
         .executableTarget(name: "sra-asm-driver", dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser"), .target(name: "sra-asm")])
